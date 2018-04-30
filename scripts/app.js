@@ -58,6 +58,9 @@
     app.saveSelectedCities();
     app.toggleAddDialog(false);
   });
+  document.getElementById('butSrcCity').addEventListener('click', function() {
+    alert('Procurar Cidade');
+  });
 
   document.getElementById('butAddCancel').addEventListener('click', function() {
     // Close the add new city dialog

@@ -1,3 +1,8 @@
 .header{
 	background: #2a9a5d;
 }
+.header #butSrcCity {
+    background: url(/images/magnifier.png) center center no-repeat; 
+    color: red;
+}
+

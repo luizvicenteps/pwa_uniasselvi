@@ -19,21 +19,28 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="icon" href="favicon.ico">
   <link rel="canonical" href="https://weather-pwa-sample.firebaseapp.com/final/">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Weather PWA</title>
+  <title>PWA Uniasselvi - Clima e Tempo</title>
   <link rel="stylesheet" type="text/css" href="styles/inline.css">
   <link rel="stylesheet" type="text/css" href="styles/customized.css">
 
   <!-- TODO add manifest here -->
-  
+  <link rel="manifest" href="manifest.json">
+  <!-- Add to home screen for Safari on iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="PWA Uniasselvi">
+  <link rel="apple-touch-icon" href="pwa_uniasselvi/images/icons/icon-152x152.png">
+  <meta name="msapplication-TileImage" content="pwa_uniasselvi/images/icons/icon-144x144.png">
+  <meta name="msapplication-TileColor" content="#2F3BA2">
 </head>
 <body>
 
   <header class="header">
-    <h1 class="header__title">Weather PWA</h1>
+    <h1 class="header__title">PWA Uniasselvi</h1>
     <button id="butRefresh" class="headerButton" aria-label="Refresh"></button>
-    <button id="butSrcCity" class="headerButton" aria-label="Search"></button>
     <button id="butAdd" class="headerButton" aria-label="Add"></button>
   </header>
 
@@ -48,7 +55,7 @@
         <div class="visual">
           <div class="icon"></div>
           <div class="temperature">
-            <span class="value"></span><span class="scale">°F</span>
+            <span class="value"></span><span class="scale">°C</span>
           </div>
         </div>
         <div class="description">
@@ -152,20 +159,8 @@
           <option value="2487956">San Francisco, CA</option>
           <option value="2490383">Seattle, WA</option>
           <option value="455833">Manaus, AM, BR</option>
+          <option value="455827">São Paulo, SP, BR</option>
         </select>
-      </div>
-      <div class="dialog-buttons">
-        <button id="butAddCity" class="button">Add</button>
-        <button id="butAddCancel" class="button">Cancel</button>
-      </div>
-    </div>
-  </div>
-  <!-- Dialog para pesquisar Cidade -->
-  <div class="dialog-container">
-    <div class="dialog">
-      <div class="dialog-title">Search City</div>
-      <div class="dialog-body">
-        <input type="" name="">
       </div>
       <div class="dialog-buttons">
         <button id="butAddCity" class="button">Add</button>
@@ -181,6 +176,7 @@
   </div>
 
   <!-- Uncomment the line below when ready to test with fake data -->
+  <script src="scripts/util.js" async></script>
   <script src="scripts/app.js" async></script>
 
 </body>

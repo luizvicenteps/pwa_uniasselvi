@@ -2,7 +2,24 @@
 	background: #2a9a5d;
 }
 .header #butSrcCity {
-    background: url(/images/magnifier.png) center center no-repeat; 
+    background: url(/pwa_uniasselvi/images/magnifier.png) center center no-repeat; 
     color: red;
 }
-
+.description {
+    text-transform: capitalize;
+}
+.weather-forecast .current .humidity:before {
+    content: "Umidade: ";
+}
+.weather-forecast .current .wind:before {
+    content: "Vento: ";
+}
+.weather-forecast .current .sunrise:before {
+    content: "Nascer do Sol: ";
+}
+.weather-forecast .current .sunset:before {
+    content: "Por do Sol: ";
+}
+.weather-forecast .icon.night-clear {
+    background-image: url(/pwa_uniasselvi/images/night-clear.png);
+}

@@ -15,7 +15,6 @@
 
 (function() {
   'use strict';
-
   var app = {
     isLoading: true,
     visibleCards: {},
@@ -24,7 +23,7 @@
     cardTemplate: document.querySelector('.cardTemplate'),
     container: document.querySelector('.main'),
     addDialog: document.querySelector('.dialog-container'),
-    daysOfWeek: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    daysOfWeek: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom']
   };
 
 
@@ -58,9 +57,6 @@
     app.saveSelectedCities();
     app.toggleAddDialog(false);
   });
-  document.getElementById('butSrcCity').addEventListener('click', function() {
-    alert('Procurar Cidade');
-  });
 
   document.getElementById('butAddCancel').addEventListener('click', function() {
     // Close the add new city dialog
@@ -86,6 +82,7 @@
   // Updates a weather card with the latest weather forecast. If the card
   // doesn't already exist, it's cloned from the template.
   app.updateForecastCard = function(data) {
+    console.log(data);
     var dataLastUpdated = new Date(data.created);
     var sunrise = data.channel.astronomy.sunrise;
     var sunset = data.channel.astronomy.sunset;
@@ -117,11 +114,24 @@
     }
     cardLastUpdatedElem.textContent = data.created;
 
-    card.querySelector('.description').textContent = current.text;
-    card.querySelector('.date').textContent = current.date;
+//  card.querySelector('.description').textContent = current.text;
+    card.querySelector('.description').textContent = ywcc_ptbr[data.channel.item.condition.code]; //vem do objeto em util.js
+//  card.querySelector('.date').textContent = current.date;
+
+//data PT-BR
+    var datePT = new Date(dataLastUpdated);
+    var options = {
+      weekday: "short", year: "numeric", month: "short",
+      day: "numeric", hour: "2-digit", minute: "2-digit"
+    };
+    datePT = datePT.toLocaleTimeString("pt-br", options);
+//data PT-BR
+
+    card.querySelector('.date').textContent = datePT;
     card.querySelector('.current .icon').classList.add(app.getIconClass(current.code));
-    card.querySelector('.current .temperature .value').textContent =
-      Math.round(current.temp);
+    console.log(app.getIconClass(current.code));
+      //var tempp = ftoc(current.temp);
+    card.querySelector('.current .temperature .value').textContent = FtoC(current.temp);
     card.querySelector('.current .sunrise').textContent = sunrise;
     card.querySelector('.current .sunset').textContent = sunset;
     card.querySelector('.current .humidity').textContent =
@@ -139,10 +149,8 @@
         nextDay.querySelector('.date').textContent =
           app.daysOfWeek[(i + today) % 7];
         nextDay.querySelector('.icon').classList.add(app.getIconClass(daily.code));
-        nextDay.querySelector('.temp-high .value').textContent =
-          Math.round(daily.high);
-        nextDay.querySelector('.temp-low .value').textContent =
-          Math.round(daily.low);
+        nextDay.querySelector('.temp-high .value').textContent = FtoC(daily.high);
+        nextDay.querySelector('.temp-low .value').textContent = FtoC(daily.low);
       }
     }
     if (app.isLoading) {
@@ -172,7 +180,24 @@
     var url = 'https://query.yahooapis.com/v1/public/yql?format=json&q=' +
         statement;
     // TODO add cache logic here
-
+    if ('caches' in window) {
+      /*
+       * Check if the service worker has already cached this city's weather
+       * data. If the service worker has the data, then display the cached
+       * data while the app fetches the latest data.
+       */
+      caches.match(url).then(function(response) {
+        if (response) {
+          response.json().then(function updateFromCache(json) {
+            var results = json.query.results;
+            results.key = key;
+            results.label = label;
+            results.created = json.query.created;
+            app.updateForecastCard(results);
+          });
+        }
+      });
+    }
     // Fetch the latest data.
     var request = new XMLHttpRequest();
     request.onreadystatechange = function() {
@@ -213,12 +238,15 @@
     // Weather codes: https://developer.yahoo.com/weather/documentation.html#codes
     weatherCode = parseInt(weatherCode);
     switch (weatherCode) {
+      case 31: // clear (night)
+        return 'night-clear';
       case 25: // cold
       case 32: // sunny
       case 33: // fair (night)
       case 34: // fair (day)
       case 36: // hot
       case 3200: // not available
+      case 31: // clear (night)
         return 'clear-day';
       case 0: // tornado
       case 1: // tropical storm
@@ -264,7 +292,6 @@
       case 26: // cloudy
       case 27: // mostly cloudy (night)
       case 28: // mostly cloudy (day)
-      case 31: // clear (night)
         return 'cloudy';
       case 29: // partly cloudy (night)
       case 30: // partly cloudy (day)
@@ -280,7 +307,7 @@
    */
   var initialWeatherForecast = {
     key: '2459115',
-    label: 'New York-FAKE, NY',
+    label: 'New York, NY',
     created: '2016-07-22T01:00:00Z',
     channel: {
       astronomy: {
@@ -314,20 +341,20 @@
     }
   };
   // TODO uncomment line below to test app with fake data
-  //app.updateForecastCard(initialWeatherForecast);
+  // app.updateForecastCard(initialWeatherForecast);
 
-  // TODO add startup code here
   /************************************************************************
    *
    * Code required to start the app
    *
-   * OBSERVAÇÃO: To simplify this codelab, we've used localStorage.
+   * NOTE: To simplify this codelab, we've used localStorage.
    *   localStorage is a synchronous API and has serious performance
    *   implications. It should not be used in production applications!
    *   Instead, check out IDB (https://www.npmjs.com/package/idb) or
    *   SimpleDB (https://gist.github.com/inexorabletash/c8069c042b734519680c)
    ************************************************************************/
 
+  // TODO add startup code here
   app.selectedCities = localStorage.selectedCities;
   if (app.selectedCities) {
     app.selectedCities = JSON.parse(app.selectedCities);
@@ -348,9 +375,35 @@
   }
 
   // TODO add service worker code here
-    if ('serviceWorker' in navigator) {
+  if ('serviceWorker' in navigator) {
     navigator.serviceWorker
              .register('./service-worker.js')
              .then(function() { console.log('Service Worker Registered'); });
   }
+  //Converter Fahrenheit em Celsios
+  function FtoC(input){
+    var tempF = input;
+    var tempC = Math.round((Math.round(tempF)-32)/1.88);
+    return tempC;
+  }
+
+  document.addEventListener('beforeinstallprompt', function(e) {
+    // beforeinstallprompt Event fired
+    console.log('Aqui é o prompt');
+    alert('Prompt de Instalação');
+    // e.userChoice will return a Promise.
+    // For more details read: https://developers.google.com/web/fundamentals/getting-started/primers/promises
+    e.userChoice.then(function(choiceResult) {
+  
+      console.log(choiceResult.outcome);
+  
+      if(choiceResult.outcome == 'dismissed') {
+        console.log('User cancelled home screen install');
+      }
+      else {
+        console.log('User added to home screen');
+      }
+    });
+  });
+
 })();
